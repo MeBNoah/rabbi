@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+
+require('./commands/rabbi-write')()
+require('./commands/rabbi-read')()
+require('./commands/rabbi-connect')()
+
+var program = require('commander')
+
+var packageJson = require('./package.json');
+
+program
+	.version(packageJson.version)
+	.usage('<command> [options]')
+
+program.parse(process.argv);

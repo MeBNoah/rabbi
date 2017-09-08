@@ -1,0 +1,23 @@
+{
+  "name": "rabbi",
+  "version": "1.0.0",
+  "description": "cli to test rabbitmq service",
+  "bin": {
+    "rabbi": "./rabbi.js"
+  },
+  "main": "rabbi.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "keywords": [
+    "rabbitmq",
+    "test",
+    "cli"
+  ],
+  "author": "mebnoah",
+  "license": "MIT",
+  "dependencies": {
+    "amqplib": "^0.5.1",
+    "commander": "^2.9.0"
+  }
+}

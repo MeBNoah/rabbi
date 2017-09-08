@@ -1,0 +1,38 @@
+#!/usr/bin/env node
+
+var program = require('commander')
+var amqp = require('amqplib')
+
+module.exports = function read() {
+  program
+    .command('connect')
+    .option('-H, --host <host>')
+    .option('-u, --user <user>')
+    .option('-p, --password <password>')
+    .action(function (options) {
+
+      var host = options.host || 'localhost'
+      var user = options.user || ''
+      var password = options.password || ''
+
+      var uri = ''
+
+      if (user === '' && password === '') {
+        uri = 'amqp://' + host
+      } else {
+        uri = 'amqp://' + user + ':' + password + '@' + host
+      }
+
+      amqp.connect(uri)
+        .then(function (connection) {
+          if (connection){
+            console.log('connection established')
+            process.exit(0) //check if neccesarry
+          }
+        })
+        .catch(function (err) {
+          console.log('could not establish connection: ' + err)
+        })
+
+    })
+}
