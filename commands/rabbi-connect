@@ -27,6 +27,8 @@ module.exports = function read() {
         .then(function (connection) {
           if (connection){
             console.log('connection established')
+            //save file with creds that it used from the other subcommand to connect
+
             process.exit(0) //check if neccesarry
           }
         })

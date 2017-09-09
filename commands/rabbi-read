@@ -1,0 +1,38 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+
+module.exports = function read() {
+  program
+    .command('read')
+    .option('-q, --queue <name>')
+    .action(function (options) {
+
+      var q = options.queue ||  "tasks"
+      var open = require('amqplib').connect('amqp://localhost')
+
+      open.then(function (connection) {
+        console.log('connection established')
+        return connection.createChannel()
+      }).then(function (channel) {
+        console.log('channel created')
+        return channel.assertQueue(q).then(function (ok) {
+          return channel.consume(q, function (msg) {
+            if (msg !== null) {
+              console.log(msg.content.toString())
+              channel.ack(msg);
+            }
+          })
+        })
+      }).then(function () {
+        console.log('written to queue')
+        setTimeout(function () {
+          process.exit(0)
+        }, 1000);
+      }).catch(function (err) {
+        console.log('could not establish connection: ' + err)
+        process.exit(1)
+      })
+
+    });
+}

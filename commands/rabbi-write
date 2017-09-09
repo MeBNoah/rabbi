@@ -1,0 +1,54 @@
+#!/usr/bin/env node
+
+var fs = require('fs')
+var program = require('commander')
+var amqplib = require('amqplib')
+
+var creds = JSON.parse(fs.readFileSync('./creds.json', 'utf8'))
+if (undefined != creds) {
+  uri = 'amqp://' + creds.username + ':' + creds.password + '@localhost:5672'
+}
+
+module.exports = function write() {
+  program
+    .command('write <msg>')
+    .option('-q, --queue <name>')
+    .option('-d, --durable')
+    .action(function (msg, flags) {
+
+      var q = flags.queue ||  "tasks"
+      var message = msg || "random message"
+
+      var open = amqplib.connect(uri)
+      open.then(function (connection) {
+        console.log('connection established')
+        return connection.createChannel()
+      }).then(function (channel) {
+        console.log('channel created')
+
+
+
+
+        options = {}
+        if (flags.durable) {
+          console.log('durable !')
+          options.durable = true
+        }
+        channel.sendToQueue(q, new Buffer(message)).then(function () {
+          console.log('written to queue')
+        })
+
+
+
+
+      }).then(function () {
+        setTimeout(function () {
+          process.exit(0)
+        }, 1000);
+      }).catch(function (err) {
+        console.log('could not establish connection: ' + err)
+        process.exit(1)
+      })
+
+    });
+}

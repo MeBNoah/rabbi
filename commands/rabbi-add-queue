@@ -1,0 +1,90 @@
+#!/usr/bin/env node
+
+var fs = require('fs')
+var program = require('commander')
+var amqplib = require('amqplib')
+
+
+
+module.exports = add_queue
+
+function add_queue() {
+  program
+    .command('add-queue <name>')
+    .option('-d, --durable')
+    .action(function (name, flags) {
+
+      var open = amqplib.connect(uri)
+
+      open.then(function (connection) {
+        console.log('connection established')
+        return connection.createChannel()
+      }).then(function (channel) {
+        console.log('channel created')
+
+
+
+        options = {}
+        if (flags.durable) {
+          options.durable = true
+        }
+
+        channel.assertQueue(name, options).then(function () {
+          console.log('queue created')
+        })
+
+
+
+      }).then(function () {
+        setTimeout(function () {
+          process.exit(0)
+        }, 1000);
+      }).catch(function (err) {
+        console.log('could not establish connection: ' + err)
+        process.exit(1)
+      })
+    })
+}
+
+function connect() {
+  var creds = JSON.parse(fs.readFileSync('./creds.json', 'utf8'))
+
+  var uri = 'amqp://localhost'
+  if (undefined != creds) {
+    uri = 'amqp://' + creds.username + ':' + creds.password + '@localhost:5672'
+  }
+
+  var open = amqplib.connect(uri)
+
+  open.then(function (connection) {
+    console.log('connection established')
+    return connection.createChannel()
+  }).then(function (channel) {
+    console.log('channel created')
+
+
+
+    options = {}
+    if (flags.durable) {
+      options.durable = true
+    }
+
+    channel.assertQueue(name, options).then(function () {
+      console.log('queue created')
+    }).catch(function (err) {
+      console.log('could not create queue')
+    })
+
+
+
+  }).then(function () {
+    setTimeout(function () {
+      process.exit(0)
+    }, 1000);
+  }).catch(function (err) {
+    console.log('could not establish connection: ' + err)
+    process.exit(1)
+  })
+
+
+}
